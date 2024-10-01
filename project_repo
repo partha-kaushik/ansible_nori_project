@@ -1,0 +1,3 @@
+jfrog_url: "https:///artifactory/api/generic/nimbus12_repo-generic-local/"
+jfrog_token: "cmVmdGtuOjAxOjE3NTkyNDU4ODQ6dlFQaE9icFZtYnNNeUJTQ1ZZS3pSdm8yV2RO"
+jfrog_artifact: "RandomFilePicker_1.2.9.zip"

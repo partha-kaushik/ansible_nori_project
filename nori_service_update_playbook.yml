@@ -1,0 +1,43 @@
+---
+#  Run command-line: ansible-playbook -i ./inventory.yml ./install_python_on_remote_node_pbook.yml
+##########
+# Before ansible can run against a target, we need to ensure that Python is installed on the target
+# This is done by setting gather_facts to False and running some pre_tasks using the 'raw' module.
+# The following code deals only with Ubuntu and RedHat; windows and other *nixes are not covered.
+##########
+- hosts: all
+  gather_facts: False
+  #tasks:
+  #  - include_vars: inventory/group_vars/noriservers_vars.vault
+  pre_tasks:
+    - name: check for redhat
+      raw: cat /etc/os-release | grep rhel
+      ignore_errors: true
+      register: redhat
+
+    - name: Is it RedHat
+      debug:
+        msg: " Redhat : {{ redhat.rc }} "
+
+    - name: check for Ubuntu
+      raw: cat /etc/os-release | grep ubuntu
+      ignore_errors: true
+      register: ubuntu
+
+    - name: Gathering Facts
+      setup:
+
+###  Roles Section #################
+  roles:
+  - include_role:
+    name: download_artifact
+    debug:
+      msg: "after we ran download_artifact"
+
+  - include_role:
+    name: update_nori
+    debug:
+      msg: "after we ran update_nori"
+
+
+  ### add other roles as required

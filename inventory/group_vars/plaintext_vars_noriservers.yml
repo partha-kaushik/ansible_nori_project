@@ -1,0 +1,11 @@
+ansible_user: partha
+ansible_ssh_pass: Passw0rd
+jfrog_url: https://nimbus12.jfrog.io/artifactory
+jfrog_reponame: nimbus12_repo-generic-local
+archive_file_name: "app_api_v1.2.9.tgz"
+target_path: /home/partha/nori/updates
+jfrog_key: "cmVmdGtuOjAxOjE3NTkyNDU4ODQ6dlFQaE9icFZtYnNNeUJTQ1ZZS3pSdm8yV2RO"
+jfrog_username: "bhaskar.krishna12@gmail.com"
+nori_admin_user: "noriAdmin"
+nori_admin_password: "noriAdminPassw0rd"
+nori_live_dir: "/opt/nori"

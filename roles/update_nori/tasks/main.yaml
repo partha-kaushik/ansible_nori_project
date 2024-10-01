@@ -1,0 +1,75 @@
+- name: show the newly created directory path
+  debug:
+    msg: "Directory path is {{ new_nori_dir.path }}"
+
+# Stop nori
+- name: stop nori
+  remote_user: "{{ nori_admin_user | trim }}"
+  #become: yes
+  vars:
+    ansible_become_pass: "{{nori_admin_password | trim}}"
+  shell: |
+    cd "{{nori_live_dir}}"
+    # commands to stop nori with options for graceful exit
+    # commands to verify nori is stopped
+
+# if nori is a systemd service ...
+# - name: Stop nori service 
+#   become: true
+#   service:
+#     name: nori
+#     state: stopped
+
+- name: Get timestamp from the system
+  shell: "date +%Y-%m-%d-%H-%M-%S"
+  register: tstamp
+
+- name: System timestamp - date
+  debug:
+    msg:  "Current date: {{ tstamp.stdout }}"
+
+- name: Create time-stamped 'old_nori' directory to copy files to
+  file:
+    path: "{{target_path | trim}}/old_nori_{{tstamp.stdout}}"  # directory to create
+    state: directory
+    mode: '0755'  # permissions
+  register: old_nori_dir
+
+- name: show the newly created directory path
+  debug:
+    msg: "Directory path is {{ old_nori_dir.path }}"
+
+- name: Copy out current nori files from 'nori_live_dir'
+  copy:
+    remote_src: true
+    src: "{{nori_live_dir}}/"   
+    dest: "{{old_nori_dir.path}}/"
+
+- name: Copy new nori files to 'nori_live_dir'
+  become: true
+  remote_user: "{{ nori_admin_user | trim }}"
+  vars:
+    ansible_sudo_pass: "{{ansible_ssh_pass | trim}}"
+  copy:
+    remote_src: true
+    src: "{{new_nori_dir.path}}/"
+    dest: "{{nori_live_dir}}/"   
+
+# Start nori
+- name: start nori
+  become: true
+  become_user: "{{ nori_admin_user }}"
+  vars:
+    ansible_sudo_pass: "{{ansible_ssh_pass | trim}}"
+  shell: |
+    cd "{{nori_live_dir}}"
+    # commands to start nori with options to wait for startup
+    # commands to verify nori is started
+
+# if nori is a systemd service ...
+# - name: Start nori service 
+#   become: true
+#   service:
+#     name: nori
+#     state: started
+

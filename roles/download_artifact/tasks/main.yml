@@ -1,0 +1,54 @@
+---
+- name: Check JFrog
+  uri:
+    url: "{{ jfrog_url | trim }}"
+    status_code: 200
+  register: JfrogCheck
+
+- debug: var=JfrogCheck.status
+
+- name: Download artifact
+  become: false
+  get_url:
+    url: "{{ jfrog_url | trim }}/{{ jfrog_reponame | trim }}/{{archive_file_name |trim}}"
+    dest: "{{ target_path | trim }}"
+    url_username: "{{ jfrog_username | trim }}"
+    url_password: "{{ jfrog_key | trim }}"
+  when: JfrogCheck.status == 200
+
+# - name: Ansible fact - ansible_date_time
+#   debug:
+#     var: ansible_date_time
+
+# - name: Ansible fact - ansible_date_time.iso8601
+#   debug:
+#     msg: "Timestamp ISO8601 short-format: {{ ansible_date_time.iso8601_basic_short }}"
+
+- name: Get timestamp from the system
+  shell: "date +%Y-%m-%d-%H-%M-%S"
+  register: tstamp
+
+- name: System timestamp - date
+  debug:
+    msg:  "Current date: {{ tstamp.stdout }}"
+
+- name: Create time-stamped directory to extract to
+  file:
+    path: "{{target_path | trim}}/new_nori_{{tstamp.stdout}}"  # directory to create
+    state: directory
+    mode: '0755'  # permissions
+  register: new_nori_dir
+
+- name: show the newly created directory path
+  debug:
+    msg: "Directory path is {{ new_nori_dir.path }}"
+
+- name: Unarchive the downloaded artifact
+  ansible.builtin.unarchive:
+    src: "{{target_path | trim}}/{{archive_file_name | trim}}"
+    dest: "{{ new_nori_dir.path }}"
+    remote_src: yes
+  
+
+
+
